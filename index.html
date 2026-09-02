@@ -704,30 +704,36 @@ addEventListener('keydown',function(e){
   if((e.ctrlKey||e.metaKey)&&['+','-','=','0'].indexOf(e.key)>-1) e.preventDefault();
 });
 
-/* деревянный щелчок — вариант E (Web Audio, без внешних файлов) */
-var actx=null, tick=null;
-function clickSound(){
+/* щелчок — звуковой файл click.mp3, вшит в страницу как data:URI,
+   поэтому страница остаётся одним автономным файлом и работает без сети */
+var CLICK_SND='data:audio/mpeg;base64,//uQxAAAE+FfVrSXgALBLq07MvAACAAEIIEBAKBQgY2aMVhcExWK0bx48qnyDi3i5lzOhDDQNA6FAyRKXkVhyFsLgdCgiYp6PFYhiGIYdaHq+P4Dx5Ej7w8ePHjx4r1er38f016UpSn/gP3+8QHkSn9KUpTX9KfMN+r2ePEpAeUprL9kZHjx5EpSl73/////973fvHjyJSn////+HjO/f3PwTB8Hw///g4CGCAPg+D5/+D4fzNVnJCAAIjAAFEVArvV0f88OAg9woHS1RTir60EMuQuaKvxzNoAZW5btYNoUoVg+Wk6W2R6nRjEvP18rWU9cY+aF+fopPHMhyi3GzV7XUpvNbnBRzCulFesuf//DiN6GJBC4MW14T59bP//7BD7xSr00FhxbHzXGc/////W3UZ9HzBiv2Wt/bNX1t/GM19a//+rdAVzc7fXkne4l8760KNm2ra3CfAZ/b3iUJHgalVLVrteQAGTVkGoNR1oHQigRHQlA2NkoNQap5yofxBiFGkHEAtC4lxUK6QpiVxblWok8SoW4Q4lxzIUbppGk//uSxB4AGFmLLpzHgAKKMGE0x5tJolchyihoaX0gw9RcjSWm1DYiuYWWCy4bTlOllvR8xGkoo24NrNqGqGZiTyihT4jb7CaJ0vo0r2AzRmFW2tmsF7rOvmC9evYtpXzNutavXr3cFWsuqvYuYUbdXsWtXr63rrda1t669rWt8b9s1/xbFvnWLf2hPnz58DMlEUs+Jg7yolDVvxK7dvEFJOSORSsxe762C7lmWHrQnqZeZXd2tktN4Qk6xVRlyG60snQngdUj0B4hBUhnuiCgGSVDULiPomytq9XSpV0FTR6Q4uf6wVCfy2yvS4JJejYLcUOx0Sgo0DDAISYmE8jqIMmjTolIt++EnyjSiTtqJxS0Tj1bPOXPfHInFLlkjYSqWLRJPhuM+ORwGXOgEo8JqSgZE4tRw2DCiBKHn/z5VTy9TEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7ksQxg8BAAgAMgAAgAAA0gAAABFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/+5LEOQPAAAGkAAAAIAAANIAAAARVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVTEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//uSxDkDwAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVQ==';
+var CLICK_GAIN=.28;      /* исходный пик файла 0.82 — приглушаем до тихого уровня */
+var CLICK_SKIP=.006;     /* в начале mp3 около 6 мс тишины, пропускаем её ради отклика */
+var actx=null, tick=null, tickEl=null;
+function tickFallback(){            /* если Web Audio недоступен или буфер ещё не готов */
+  try{
+    if(!tickEl){ tickEl=new Audio(CLICK_SND); tickEl.preload='auto'; tickEl.volume=CLICK_GAIN; }
+    tickEl.currentTime=0; tickEl.play();
+  }catch(err){}
+}
+(function initTick(){               /* декодируем файл заранее, чтобы первый клик уже звучал */
   try{
     var AC=window.AudioContext||window.webkitAudioContext; if(!AC) return;
-    if(!actx){
-      actx=new AC();
-      var sr=actx.sampleRate, len=Math.floor(sr*.05);
-      tick=actx.createBuffer(1,len,sr);
-      var d=tick.getChannelData(0);
-      for(var k=0;k<len;k++){
-        var t=k/sr;
-        d[k]=(Math.sin(2*Math.PI*600*t)*.8 + (Math.random()*2-1)*.5*Math.exp(-t*500))*Math.exp(-t*120);
-      }
-    }
+    actx=new AC();
+    var raw=atob(CLICK_SND.slice(CLICK_SND.indexOf(',')+1)), n=raw.length, u=new Uint8Array(n);
+    for(var k=0;k<n;k++) u[k]=raw.charCodeAt(k);
+    actx.decodeAudioData(u.buffer,function(buf){tick=buf;},function(){});
+  }catch(err){ actx=null; }
+})();
+function clickSound(){
+  try{
+    if(!actx){ tickFallback(); return; }
     function fire(){
-      var t=actx.currentTime+.004;
-      var src=actx.createBufferSource(), f=actx.createBiquadFilter(), g=actx.createGain();
-      src.buffer=tick;
-      f.type='bandpass'; f.frequency.value=900; f.Q.value=6;
-      g.gain.setValueAtTime(.7,t);
-      g.gain.exponentialRampToValueAtTime(.0001,t+.07);
-      src.connect(f); f.connect(g); g.connect(actx.destination);
-      src.start(t);
+      if(!tick){ tickFallback(); return; }
+      var src=actx.createBufferSource(), g=actx.createGain();
+      src.buffer=tick; g.gain.value=CLICK_GAIN;
+      src.connect(g); g.connect(actx.destination);
+      src.start(actx.currentTime+.004, CLICK_SKIP);  /* запас, чтобы не попасть в прошлое */
     }
     if(actx.state!=='running'){
       var pr=actx.resume();
@@ -735,21 +741,30 @@ function clickSound(){
     } else fire();
   }catch(err){}
 }
-/* отклик на любой клик — включая стартовый экран и кнопки */
+/* что считается кнопкой: только по ним звучит щелчок */
+var CLICK_SEL='button, [role="button"], #dots i';
+function isBtn(el){ return !!(el && el.closest && el.closest(CLICK_SEL)); }
+/* картинка отклика — на любой клик, звук — только на кнопках */
 document.addEventListener('pointerdown',function(e){
-  clickSound(); ring(e.clientX,e.clientY);
+  if(isBtn(e.target)) clickSound();
+  ring(e.clientX,e.clientY);
 }, true);
 /* запасной путь для браузеров без Pointer Events */
 if(!window.PointerEvent){
-  document.addEventListener('mousedown',function(e){ clickSound(); ring(e.clientX,e.clientY); }, true);
+  document.addEventListener('mousedown',function(e){
+    if(isBtn(e.target)) clickSound();
+    ring(e.clientX,e.clientY);
+  }, true);
   document.addEventListener('touchstart',function(e){
-    var t=e.touches[0]; clickSound(); if(t) ring(t.clientX,t.clientY);
+    var t=e.touches[0];
+    if(isBtn(e.target)) clickSound();
+    if(t) ring(t.clientX,t.clientY);
   }, true);
 }
-/* тот же щелчок при управлении с клавиатуры (Enter, пробел, стрелки) */
+/* с клавиатуры — только когда нажата сама кнопка (Enter или пробел на ней) */
 document.addEventListener('keydown',function(e){
   if(e.repeat) return;
-  if(['Enter',' ','Spacebar','ArrowLeft','ArrowRight','PageUp','PageDown','Home','End'].indexOf(e.key)>-1) clickSound();
+  if(['Enter',' ','Spacebar'].indexOf(e.key)>-1 && isBtn(document.activeElement)) clickSound();
 }, true);
 /* переход по клику: только во время показа и вне панелей */
 document.addEventListener('click',function(e){
