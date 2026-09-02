@@ -717,7 +717,7 @@ function clickSound(){
       var src=actx.createBufferSource(), f=actx.createBiquadFilter(), g=actx.createGain();
       src.buffer=tick;
       f.type='highpass'; f.frequency.value=1800;
-      g.gain.setValueAtTime(.22,t);
+      g.gain.setValueAtTime(.7,t);
       g.gain.exponentialRampToValueAtTime(.0001,t+.03);
       src.connect(f); f.connect(g); g.connect(actx.destination);
       src.start(t);
@@ -735,7 +735,7 @@ document.addEventListener('pointerdown',function(e){
 /* переход по клику: только во время показа и вне панелей */
 document.addEventListener('click',function(e){
   if(!document.body.classList.contains('started')) return;
-  if(e.target.closest('#nav,.landing-header,#landing')) return;
+  if(e.target.closest('button,#dots')) return;
   go(e.clientX>innerWidth*0.5? i+1 : i-1); pause();
 });
 go(0);
