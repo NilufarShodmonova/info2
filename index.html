@@ -704,36 +704,38 @@ addEventListener('keydown',function(e){
   if((e.ctrlKey||e.metaKey)&&['+','-','=','0'].indexOf(e.key)>-1) e.preventDefault();
 });
 
-/* щелчок — звуковой файл click.mp3, вшит в страницу как data:URI,
-   поэтому страница остаётся одним автономным файлом и работает без сети */
-var CLICK_SND='data:audio/mpeg;base64,//uQxAAAE+FfVrSXgALBLq07MvAACAAEIIEBAKBQgY2aMVhcExWK0bx48qnyDi3i5lzOhDDQNA6FAyRKXkVhyFsLgdCgiYp6PFYhiGIYdaHq+P4Dx5Ej7w8ePHjx4r1er38f016UpSn/gP3+8QHkSn9KUpTX9KfMN+r2ePEpAeUprL9kZHjx5EpSl73/////973fvHjyJSn////+HjO/f3PwTB8Hw///g4CGCAPg+D5/+D4fzNVnJCAAIjAAFEVArvV0f88OAg9woHS1RTir60EMuQuaKvxzNoAZW5btYNoUoVg+Wk6W2R6nRjEvP18rWU9cY+aF+fopPHMhyi3GzV7XUpvNbnBRzCulFesuf//DiN6GJBC4MW14T59bP//7BD7xSr00FhxbHzXGc/////W3UZ9HzBiv2Wt/bNX1t/GM19a//+rdAVzc7fXkne4l8760KNm2ra3CfAZ/b3iUJHgalVLVrteQAGTVkGoNR1oHQigRHQlA2NkoNQap5yofxBiFGkHEAtC4lxUK6QpiVxblWok8SoW4Q4lxzIUbppGk//uSxB4AGFmLLpzHgAKKMGE0x5tJolchyihoaX0gw9RcjSWm1DYiuYWWCy4bTlOllvR8xGkoo24NrNqGqGZiTyihT4jb7CaJ0vo0r2AzRmFW2tmsF7rOvmC9evYtpXzNutavXr3cFWsuqvYuYUbdXsWtXr63rrda1t669rWt8b9s1/xbFvnWLf2hPnz58DMlEUs+Jg7yolDVvxK7dvEFJOSORSsxe762C7lmWHrQnqZeZXd2tktN4Qk6xVRlyG60snQngdUj0B4hBUhnuiCgGSVDULiPomytq9XSpV0FTR6Q4uf6wVCfy2yvS4JJejYLcUOx0Sgo0DDAISYmE8jqIMmjTolIt++EnyjSiTtqJxS0Tj1bPOXPfHInFLlkjYSqWLRJPhuM+ORwGXOgEo8JqSgZE4tRw2DCiBKHn/z5VTy9TEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7ksQxg8BAAgAMgAAgAAA0gAAABFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/+5LEOQPAAAGkAAAAIAAANIAAAARVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVTEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//uSxDkDwAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVQ==';
-var CLICK_GAIN=.28;      /* исходный пик файла 0.82 — приглушаем до тихого уровня */
-var CLICK_SKIP=.006;     /* в начале mp3 около 6 мс тишины, пропускаем её ради отклика */
-var actx=null, tick=null, tickEl=null;
-function tickFallback(){            /* если Web Audio недоступен или буфер ещё не готов */
-  try{
-    if(!tickEl){ tickEl=new Audio(CLICK_SND); tickEl.preload='auto'; tickEl.volume=CLICK_GAIN; }
-    tickEl.currentTime=0; tickEl.play();
-  }catch(err){}
+/* щелчок — синтезируем на лету через Web Audio: короткий сухой тик,
+   без mp3 и без внешних файлов, страница остаётся автономной */
+var CLICK_GAIN=.6;       /* громкость тика, 0..1 */
+var CLICK_DUR=.03;       /* длительность всплеска шума, с */
+var CLICK_FREQ=2200;     /* центр полосового фильтра — выше значит суше и тоньше */
+var actx=null, tick=null;
+function buildTick(){               /* один короткий затухающий шум, переиспользуем для всех кликов */
+  var frames=Math.ceil(actx.sampleRate*CLICK_DUR);
+  var buf=actx.createBuffer(1,frames,actx.sampleRate), d=buf.getChannelData(0);
+  for(var i=0;i<frames;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/frames,3);
+  return buf;
 }
-(function initTick(){               /* декодируем файл заранее, чтобы первый клик уже звучал */
+(function initTick(){
   try{
     var AC=window.AudioContext||window.webkitAudioContext; if(!AC) return;
     actx=new AC();
-    var raw=atob(CLICK_SND.slice(CLICK_SND.indexOf(',')+1)), n=raw.length, u=new Uint8Array(n);
-    for(var k=0;k<n;k++) u[k]=raw.charCodeAt(k);
-    actx.decodeAudioData(u.buffer,function(buf){tick=buf;},function(){});
+    tick=buildTick();
   }catch(err){ actx=null; }
 })();
 function clickSound(){
   try{
-    if(!actx){ tickFallback(); return; }
+    if(!actx||!tick) return;
     function fire(){
-      if(!tick){ tickFallback(); return; }
-      var src=actx.createBufferSource(), g=actx.createGain();
-      src.buffer=tick; g.gain.value=CLICK_GAIN;
-      src.connect(g); g.connect(actx.destination);
-      src.start(actx.currentTime+.004, CLICK_SKIP);  /* запас, чтобы не попасть в прошлое */
+      var t=actx.currentTime;
+      var src=actx.createBufferSource(); src.buffer=tick;
+      var bp=actx.createBiquadFilter();   /* полосовой фильтр превращает шум в сухой щелчок */
+      bp.type='bandpass'; bp.frequency.value=CLICK_FREQ; bp.Q.value=1.1;
+      var g=actx.createGain();
+      g.gain.setValueAtTime(CLICK_GAIN,t);
+      g.gain.exponentialRampToValueAtTime(.0001,t+CLICK_DUR);
+      src.connect(bp); bp.connect(g); g.connect(actx.destination);
+      src.start(t); src.stop(t+CLICK_DUR+.005);
     }
     if(actx.state!=='running'){
       var pr=actx.resume();
