@@ -150,9 +150,10 @@ body.started #deck{top:calc(var(--hdr,96px) * .5);bottom:calc(var(--hdr,96px) * 
  border:1.5px solid var(--line);background:rgba(9,17,29,.55);color:var(--gp);
  font-family:var(--serif);font-weight:600;font-size:clamp(16px,1.35vw,23px);letter-spacing:.14em;
  text-transform:uppercase;cursor:pointer;pointer-events:auto;
- display:flex;align-items:center;justify-content:center;
+ display:flex;align-items:center;justify-content:center;gap:.6em;
  transition:border-color .3s var(--e),background .3s var(--e);
  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+#home svg{width:1.15em;height:1.15em;fill:currentColor;flex:0 0 auto;margin-top:-.08em}
 #home:hover{border-color:var(--g);background:rgba(20,32,50,.8)}
 #home:active{scale:.97}
 #dots{position:absolute;left:0;right:0;bottom:calc(2.4vh + clamp(52px,4vw,68px) + 18px);
@@ -165,6 +166,10 @@ body.started #deck{top:calc(var(--hdr,96px) * .5);bottom:calc(var(--hdr,96px) * 
  height:clamp(52px,4vw,68px);display:flex;align-items:center;
  font-family:var(--serif);font-size:clamp(14px,1.15vw,21px);
  letter-spacing:.2em;color:var(--gp);opacity:.85;transition:color .5s ease}
+@keyframes tapRing{from{opacity:.7;transform:translate(-50%,-50%) scale(.25)}
+ to{opacity:0;transform:translate(-50%,-50%) scale(1)}}
+.tap{position:fixed;width:44px;height:44px;border-radius:50%;pointer-events:none;z-index:200;
+ border:1px solid var(--gl);animation:tapRing .38s ease-out forwards}
 #bar{position:fixed;top:0;left:0;height:3px;width:0;z-index:120;
  background:linear-gradient(90deg,var(--g),var(--gl));box-shadow:0 0 12px rgba(227,178,94,.55)}
 
@@ -580,7 +585,7 @@ body.started .landing-header{top:0;left:0;right:0;border-radius:0;
   <div class="ti"><svg class="arch" viewBox="0 0 110 122" fill="none" stroke="#c9973f" stroke-width="2"><path d="M14 118 L14 52 C14 26 32 6 55 4 C78 6 96 26 96 52 L96 118"/><path d="M36 118 L36 66 A19 19 0 0 1 74 66 L74 118"/></svg><div class="kick">Yo'l qurilishi va ta'mirlash sohasi</div><h1>YO'LLAR — TARAQQIYOT ASOSI</h1><div class="rule"></div><p>Zamonaviy transport infratuzilmasi hududlar o'rtasidagi aloqani mustahkamlaydi va iqtisodiy rivojlanishga xizmat qiladi.</p></div>
 </section>
 </div>
-<div id="nav"><button class="navbtn" id="prev" aria-label="Oldingi"><svg viewBox="0 0 24 24"><path d="M15.5 3.5 7 12l8.5 8.5 1.8-1.8L10.6 12l6.7-6.7z"/></svg></button><button class="navbtn" id="next" aria-label="Keyingi"><svg viewBox="0 0 24 24"><path d="M8.5 3.5 7 5.3l6.7 6.7L7 18.7l1.5 1.8L17 12z"/></svg></button><button id="home">Main</button><div id="cnt"></div><div id="dots"></div></div>
+<div id="nav"><button class="navbtn" id="prev" aria-label="Oldingi"><svg viewBox="0 0 24 24"><path d="M15.5 3.5 7 12l8.5 8.5 1.8-1.8L10.6 12l6.7-6.7z"/></svg></button><button class="navbtn" id="next" aria-label="Keyingi"><svg viewBox="0 0 24 24"><path d="M8.5 3.5 7 5.3l6.7 6.7L7 18.7l1.5 1.8L17 12z"/></svg></button><button id="home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2 2.8 11l1.4 1.6L5 11.9V21h5.2v-5.6h3.6V21H19v-9.1l.8.7L21.2 11z"/></svg><span>Main</span></button><div id="cnt"></div><div id="dots"></div></div>
 <script>
 (function(){
 "use strict";
@@ -653,8 +658,49 @@ addEventListener('touchend',function(e){
   if(x0===null)return; var dx=e.changedTouches[0].clientX-x0;
   if(Math.abs(dx)>60){ go(dx<0? i+1 : i-1); pause(); }
   x0=null;},{passive:true});
-document.getElementById('deck').addEventListener('click',function(e){
-  var fwd=e.clientX>innerWidth*0.5; go(fwd? i+1 : i-1); pause();
+function ring(x,y){
+  var r=document.createElement('span');
+  r.className='tap'; r.style.left=x+'px'; r.style.top=y+'px';
+  document.body.appendChild(r);
+  setTimeout(function(){ r.remove(); }, 520);
+}
+/* короткий сухой щелчок (Web Audio, без внешних файлов) */
+var actx=null, tick=null;
+function clickSound(){
+  try{
+    var AC=window.AudioContext||window.webkitAudioContext; if(!AC) return;
+    if(!actx){
+      actx=new AC();
+      var len=Math.floor(actx.sampleRate*.02);
+      tick=actx.createBuffer(1,len,actx.sampleRate);
+      var d=tick.getChannelData(0);
+      for(var k=0;k<len;k++) d[k]=(Math.random()*2-1)*Math.pow(1-k/len,14);
+    }
+    function fire(){
+      var t=actx.currentTime+.004;
+      var src=actx.createBufferSource(), f=actx.createBiquadFilter(), g=actx.createGain();
+      src.buffer=tick;
+      f.type='highpass'; f.frequency.value=1800;
+      g.gain.setValueAtTime(.22,t);
+      g.gain.exponentialRampToValueAtTime(.0001,t+.03);
+      src.connect(f); f.connect(g); g.connect(actx.destination);
+      src.start(t);
+    }
+    if(actx.state!=='running'){
+      var pr=actx.resume();
+      if(pr&&pr.then) pr.then(fire,function(){}); else fire();
+    } else fire();
+  }catch(err){}
+}
+/* отклик на любой клик — включая стартовый экран и кнопки */
+document.addEventListener('pointerdown',function(e){
+  clickSound(); ring(e.clientX,e.clientY);
+}, true);
+/* переход по клику: только во время показа и вне панелей */
+document.addEventListener('click',function(e){
+  if(!document.body.classList.contains('started')) return;
+  if(e.target.closest('#nav,.landing-header,#landing')) return;
+  go(e.clientX>innerWidth*0.5? i+1 : i-1); pause();
 });
 go(0);
 pause();
