@@ -700,25 +700,28 @@ addEventListener('keydown',function(e){
   if((e.ctrlKey||e.metaKey)&&['+','-','=','0'].indexOf(e.key)>-1) e.preventDefault();
 });
 
-/* короткий сухой щелчок (Web Audio, без внешних файлов) */
+/* щелчок как у клавиатуры телефона (Web Audio, без внешних файлов) */
 var actx=null, tick=null;
 function clickSound(){
   try{
     var AC=window.AudioContext||window.webkitAudioContext; if(!AC) return;
     if(!actx){
       actx=new AC();
-      var len=Math.floor(actx.sampleRate*.02);
-      tick=actx.createBuffer(1,len,actx.sampleRate);
+      var sr=actx.sampleRate, len=Math.floor(sr*.045);
+      tick=actx.createBuffer(1,len,sr);
       var d=tick.getChannelData(0);
-      for(var k=0;k<len;k++) d[k]=(Math.random()*2-1)*Math.pow(1-k/len,14);
+      for(var k=0;k<len;k++){
+        var t=k/sr, env=Math.exp(-t*95);
+        d[k]=(Math.sin(2*Math.PI*760*t)*.72 + (Math.random()*2-1)*.38*Math.exp(-t*420))*env;
+      }
     }
     function fire(){
       var t=actx.currentTime+.004;
       var src=actx.createBufferSource(), f=actx.createBiquadFilter(), g=actx.createGain();
       src.buffer=tick;
-      f.type='highpass'; f.frequency.value=1800;
+      f.type='lowpass'; f.frequency.value=3200; f.Q.value=.7;
       g.gain.setValueAtTime(.7,t);
-      g.gain.exponentialRampToValueAtTime(.0001,t+.03);
+      g.gain.exponentialRampToValueAtTime(.0001,t+.05);
       src.connect(f); f.connect(g); g.connect(actx.destination);
       src.start(t);
     }
