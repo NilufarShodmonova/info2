@@ -739,6 +739,18 @@ function clickSound(){
 document.addEventListener('pointerdown',function(e){
   clickSound(); ring(e.clientX,e.clientY);
 }, true);
+/* запасной путь для браузеров без Pointer Events */
+if(!window.PointerEvent){
+  document.addEventListener('mousedown',function(e){ clickSound(); ring(e.clientX,e.clientY); }, true);
+  document.addEventListener('touchstart',function(e){
+    var t=e.touches[0]; clickSound(); if(t) ring(t.clientX,t.clientY);
+  }, true);
+}
+/* тот же щелчок при управлении с клавиатуры (Enter, пробел, стрелки) */
+document.addEventListener('keydown',function(e){
+  if(e.repeat) return;
+  if(['Enter',' ','Spacebar','ArrowLeft','ArrowRight','PageUp','PageDown','Home','End'].indexOf(e.key)>-1) clickSound();
+}, true);
 /* переход по клику: только во время показа и вне панелей */
 document.addEventListener('click',function(e){
   if(!document.body.classList.contains('started')) return;
