@@ -757,14 +757,29 @@ var landing=document.getElementById('landing');
     landing.classList.add('hide');
     document.body.classList.add('started');
     resume();
+    idleReset();
   });
 });
-/* кнопка "Main" — возврат на стартовый экран */
-document.getElementById('home').addEventListener('click',function(e){
-  e.stopPropagation();
+/* возврат на стартовый экран */
+function goHome(){
+  if(!document.body.classList.contains('started')) return;
   pause(); go(0);
   document.body.classList.remove('started');
   landing.classList.remove('hide');
+}
+document.getElementById('home').addEventListener('click',function(e){
+  e.stopPropagation(); goHome();
+});
+
+/* бездействие 5 мин -> обратно на стартовый экран (на самом экране таймер не идёт) */
+var IDLE=5*60*1000, idleT=null;
+function idleReset(){
+  clearTimeout(idleT);
+  if(!document.body.classList.contains('started')) return;
+  idleT=setTimeout(goHome, IDLE);
+}
+['pointerdown','pointermove','keydown','wheel','touchstart'].forEach(function(t){
+  document.addEventListener(t, idleReset, {passive:true, capture:true});
 });
 })();
 </script>
