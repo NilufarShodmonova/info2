@@ -186,10 +186,12 @@ body.started #deck{top:calc(var(--hdr,96px) * .5);bottom:calc(var(--hdr,96px) * 
  height:clamp(52px,4vw,68px);display:flex;align-items:center;
  font-family:var(--serif);font-size:clamp(14px,1.15vw,21px);
  letter-spacing:.2em;color:var(--gp);opacity:.85;transition:color .5s ease}
-@keyframes tapRing{from{opacity:.7;transform:translate(-50%,-50%) scale(.25)}
- to{opacity:0;transform:translate(-50%,-50%) scale(1)}}
-.tap{position:fixed;width:calc(44 * var(--s));height:calc(44 * var(--s));border-radius:50%;pointer-events:none;z-index:200;
- border:1px solid var(--gl);animation:tapRing .38s ease-out forwards}
+@keyframes tapDot{0%{opacity:.85;transform:translate(-50%,-50%) scale(.5)}
+ 100%{opacity:0;transform:translate(-50%,-50%) scale(1.5)}}
+.tap{position:fixed;width:calc(18 * var(--s));height:calc(18 * var(--s));border-radius:50%;
+ pointer-events:none;z-index:200;border:0;
+ background:radial-gradient(circle,rgba(245,238,223,.95) 0%,rgba(227,178,94,.55) 45%,rgba(227,178,94,0) 72%);
+ animation:tapDot .34s ease-out forwards}
 #bar{position:fixed;top:0;left:0;height:3px;width:0;z-index:120;
  background:linear-gradient(90deg,var(--g),var(--gl));box-shadow:0 0 12px rgba(227,178,94,.55)}
 
